@@ -11,8 +11,17 @@ double baseSalary;
 int workDay;
 } Employee;
 
+typedef struct {
+	char logId[20];
+	char empId[20];
+	char date[20];
+	char status[10];
+}TimeSheet;
+
 Employee employees[MAX];
 int empCount = 0;
+TimeSheet timeSheet[MAX];
+int timeCount = 0;
 //Ham tien ich tim kiem nhan vien bang id 
 int findEmpByID(char id[]) {
 for (int i = 0; i < empCount; i++) {
@@ -20,6 +29,19 @@ if (strcmp(employees[i].empId, id) == 0)
 return i;
 }
 return -1;
+}
+
+void genLogID (char logId){
+	sprintf("logId" , "HG%04f" , timeCount + 1);
+}
+
+int checked (char empId[] , char date[]){
+	for(int i = 0 ; i < timeCount ; i++){
+		if(strcmp(timeSheet[i].empId , empId) == 0 && strcmp(timeSheet[i].date , date) == 0){
+			return 1 ; 
+		}
+	}
+	return 0 ; 
 }
 
 // F01 - Them nhan vien moi 
@@ -100,7 +122,6 @@ do {
 		}while(1);
 	}
 
-
 employees[empCount++] = e;
 printf("Them nhan vien thanh cong!\n");
 }
@@ -180,15 +201,19 @@ if (empCount == 0) {
 printf("Danh sach trong!\n"); 
 return;
 }
-
+ 	printf("+----+------------+----------------------+---------------+------------+----------+\n");
+    printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
+    printf("+----+------------+----------------------+---------------+------------+----------+\n");
 for (int i = 0; i < empCount; i++) {
-    printf("\nNhan vien %d:\n", i + 1);
-    printf("Ma NV: %s\n", employees[i].empId);
-    printf("Ten NV: %s\n", employees[i].name);
-    printf("Chuc vu: %s\n", employees[i].position);
-    printf("Luong co ban: %.2lf\n", employees[i].baseSalary);
-    printf("Ngay cong: %d\n", employees[i].workDay);
+    printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
+        i + 1,
+        employees[i].empId,
+        employees[i].name,
+        employees[i].position,
+        employees[i].baseSalary,
+        employees[i].workDay);
 	}
+	printf("+----+------------+----------------------+---------------+------------+----------+\n");
 }
 
 void searchByName() {
@@ -257,7 +282,7 @@ void sortByBasesalary (){
 void addSampleList() {  // tao 1 danh sach nhan vien co san 
 Employee e1 = {"HG001", "Tran Minh Duc", "Quan li", 2000, 5};
 Employee e2 = {"HG002", "Phung Duy Dat", "Nhan vien", 1000, 3};
-Employee e3 = {"HG003", "Nguyen Minh Hieu", "Pho giam doc", 5000, 8};
+Employee e3 = {"HG003", "Nguyen Minh Hieu", "Giam doc", 5000, 8};
 employees[empCount++] = e1;
 employees[empCount++] = e2;
 employees[empCount++] = e3;
