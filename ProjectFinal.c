@@ -60,6 +60,25 @@ int checked (char empId[] , char date[]){ // kiem tra xem nhan vien da cham cong
 	return 0 ; 
 }
 
+int isValidDate(char date[]) { // ham check xem ngay co dung dinh dang khong 
+    int d, m, y;
+    if (sscanf(date, "%d/%d/%d", &d, &m, &y) != 3) // doc chuoi ki tu nguoi dung nhap vao va kiem tra
+        return 0;
+
+    if (d < 1 || d > 31) return 0;
+    if (m < 1 || m > 12) return 0;
+    if (y < 1900 || y > 2100) return 0;
+
+    return 1;
+}
+
+int isValidStatus(char st[]) { // ham check dieu kien cua trang thai 
+    return
+        strcmp(st, "Di lam") == 0 ||strcmp(st, "Nghi lam") == 0 ;
+}
+
+
+
 // F01 - Them nhan vien moi 
 void addEmployee() {
 if (empCount >= MAX) {
@@ -182,33 +201,27 @@ printf("Cap nhat nhan vien thanh cong!\n");
 
 //F03 - Quan li nhan vien : Sa thai / Nghi viec 
 void deleteEmployee() {
-char id[20];
-while (getchar() != '\n');// clear buffer , tranh bi skip
+    char id[20];
+    while (getchar() != '\n'); // clear buffer tranh bi skip
 
-printf("Nhap ma NV muon xoa: ");
-fgets(id, sizeof(id), stdin);
-id[strcspn(id, "\n")] = '\0';
+    printf("Nhap ma NV muon xoa: ");
+    fgets(id, sizeof(id), stdin);
+    id[strcspn(id, "\n")] = '\0';
 
-int idx = findEmpByID(id);  // tao bien voi ham tien ich da tao 
-if (idx == -1) {
-    printf("Khong tim thay nhan vien co ma %s!\n" , id);
-    return;
-}
+    int idx = findEmpByID(id);  // tim nhân viên
+    if (idx == -1) {
+        printf("Khong tim thay nhan vien co ma %s!\n", id);
+        return;
+    }
 
-int confirm;
-printf("Xac nhan xoa nhan vien (1: Co, 0: Khong)? ");// bien xac nhan xem co muon xoa nhan vien khong ?
-scanf("%d", &confirm);
-while (getchar() != '\n');
-
-if (confirm == 1) {
+    // dich mang de xoa phan tu
     for (int i = idx; i < empCount - 1; i++)
         employees[i] = employees[i + 1];
+
     empCount--;
-    printf("Da xoa nhan vien co ma %s!\n" , id);// Nhap 1 - dong y xoa nhan vien
-} else {
-    printf("Huy xoa nhan vien!\n");// Nhap 0 - Huy xoa nhan vien
+    printf("Da xoa nhan vien co ma %s thanh cong!\n", id);
 }
-}
+
 
 //F04 - Hien thi danh sach nhan vien 
 void printList() {
@@ -293,6 +306,83 @@ void sortByBasesalary (){
 	}
 }
 
+void checkIn() {
+    char empId[20], date[20], status[20];
+    getchar();
+
+    // Nhap ma nhân viên
+    while(1){
+    	printf("Nhap ma nhan vien : ");
+    	fgets(empId , 20 , stdin);
+    	empId[strcspn(empId , "\n")] = '\0' ;
+    	if(strlen(empId) == 0){
+    		printf("Ma nhan vien khong duoc de trong ! Nhap lai !\n");
+    		continue; //quay lai nhap ma
+		}
+		
+		int index = findEmpByID(empId);
+		if(index == -1){
+			printf("Khong tim thay nhan vien co ma %s !\n" , empId);
+			continue; // quay lai nhap ma 
+		}
+		break ; //nhap ma dung thi dung 
+	}
+
+    // Nhap ngay cham cong
+    do {
+        printf("Nhap ngay cham cong (dd/mm/yyyy): ");
+        fgets(date, 20, stdin);
+        date[strcspn(date, "\n")] = '\0';
+
+        if (strlen(date) == 0)
+            printf("Ngay khong duoc rong!\n");
+        else if (!isValidDate(date))
+            printf("Sai dinh dang ngay! Vui long nhap dd/mm/yyyy.\n");
+        else
+            break;
+
+    } while (1);
+
+    // Kiem tra da cham ngay nay chua
+    if (checked(empId, date)) {
+        printf("Nhan vien %s da cham cong ngay %s roi!\n", empId, date);
+        return;
+    }
+
+    // Nhap trang thai
+    do {
+        printf("Nhap trang thai (Di lam / Nghi lam): ");
+        fgets(status, 20, stdin);
+        status[strcspn(status, "\n")] = '\0';
+
+        if (strlen(status) == 0)
+            printf("Trang thai khong duoc rong!\n");
+        else if (!isValidStatus(status))
+            printf("Trang thai khong hop le!\n");
+        else
+            break;
+
+    } while (1);
+
+    // Ghi cham cong
+    TimeSheet ts;
+    genLogID(ts.logId);
+    strcpy(ts.empId, empId);
+    strcpy(ts.date, date);
+    strcpy(ts.status, status);
+
+    timeSheet[timeCount++] = ts;
+
+    // Cong ngay cong
+    int indx = findEmpByID(empId);
+    if (strcmp(status, "Di lam") == 0)
+        employees[indx].workDay++;
+
+    printf("Cham cong ngay %s cho nhan vien co ma %s thanh cong!\n",date, empId);
+}
+
+
+
 
 void addSampleList() {  // tao 1 danh sach nhan vien co san 
 Employee e1 = {"HG001", "Tran Minh Duc", "Quan li", 2000, 5};
@@ -302,8 +392,6 @@ employees[empCount++] = e1;
 employees[empCount++] = e2;
 employees[empCount++] = e3;
 }
-
-
 
 int main (){
 	int choice ;
@@ -331,7 +419,7 @@ int main (){
 	        case 4: printList(); break;
 			case 5: searchByName(); break;
 			case 6: sortByBasesalary(); break;
-			//case 7: checkIn(); break;
+			case 7: checkIn(); break;
 			//case 8: viewTimesheet(); break;
 			//case 9: {
 				//printf("Thoat chuong trinh !\n");
