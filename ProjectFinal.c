@@ -3,6 +3,7 @@
 
 #define MAX 100
 
+// nguyen mau ham
 typedef struct {
 char empId[20];
 char name[50];
@@ -31,11 +32,11 @@ return i;
 return -1;
 }
 
-void genLogID (char logId){
-	sprintf("logId" , "HG%04f" , timeCount + 1);
+void genLogID (char logId){ // tu tao ma log moi cho bang cham cong 
+	sprintf("logId" , "HG%04d" , timeCount + 1);
 }
 
-int checked (char empId[] , char date[]){
+int checked (char empId[] , char date[]){ // kiem tra xem nhan vien da cham cong ngay do chua
 	for(int i = 0 ; i < timeCount ; i++){
 		if(strcmp(timeSheet[i].empId , empId) == 0 && strcmp(timeSheet[i].date , date) == 0){
 			return 1 ; 
@@ -92,7 +93,7 @@ do {
         printf("Luong khong hop le. Nhap lai!\n");
         while (getchar() != '\n');
     } else {
-        while (getchar() != '\n');
+    	while(getchar() != '\n');
         break;
     }
 } while (1);
@@ -112,11 +113,10 @@ do {
 	}else{
 		do {
 			printf("Nhap ngay cong : ");
-			if(e.workDay < 0){
+			if(scanf("%d" , &e.workDay) != 1 || e.workDay < 0){
 				printf("Ngay cong khong hop le !\n");
 				while(getchar() != '\n');
 			}else {
-				while(getchar() != '\n');
 				break ;
 			}
 		}while(1);
@@ -137,7 +137,7 @@ id[strcspn(id, "\n")] = '\0';
 
 int idx = findEmpByID(id);
 if (idx == -1) {
-    printf("Khong tim thay nhan vien!\n");// tao bien voi ham tien ich da tao 
+    printf("Khong tim thay nhan vien co ma %s!\n" , id);// tao bien voi ham tien ich da tao 
     return;
 }
 
@@ -157,7 +157,7 @@ do {
         printf("Luong khong hop le. Nhap lai!\n");
         while (getchar() != '\n');
     } else {
-        while (getchar() != '\n');
+    	while(getchar() != '\n');
         break;
     }
 } while (1);
@@ -176,7 +176,7 @@ id[strcspn(id, "\n")] = '\0';
 
 int idx = findEmpByID(id);  // tao bien voi ham tien ich da tao 
 if (idx == -1) {
-    printf("Khong tim thay nhan vien!\n");
+    printf("Khong tim thay nhan vien co ma %s!\n" , id);
     return;
 }
 
@@ -313,7 +313,14 @@ int main (){
 	        case 3: deleteEmployee(); break;
 	        case 4: printList(); break;
 			case 5: searchByName(); break;
-			case 6: sortByBasesalary(); break ;
+			case 6: sortByBasesalary(); break;
+			//case 7: checkIn(); break;
+			//case 8: viewTimesheet(); break;
+			//case 9: {
+				//printf("Thoat chuong trinh !\n");
+				//break;
+			//}
+			//default : printf("Lua chon khong hop le !\n"); 
 	    }
 	    //dung switch case de chay tuong ung voi lua chon nguoi dung nhap vao
 	}while (choice != 9);
