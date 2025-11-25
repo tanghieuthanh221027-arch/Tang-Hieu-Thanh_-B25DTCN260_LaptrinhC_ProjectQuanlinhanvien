@@ -3,7 +3,22 @@
 
 #define MAX 100
 
-// nguyen mau ham
+int findEmpByID(char id[]);
+void genLogID(char logId[]);
+int checked(char empId[], char date[]);
+
+void addEmployee();       // F01
+void updateEmployee();    // F02
+void deleteEmployee();    // F03
+void printList();         // F04
+void searchByName();      // F05
+void sortByBasesalary();  // F06
+void checkIn();           // F07 
+void viewTimesheet();     // F08 
+
+// Ham ho tro
+void addSampleList();
+
 typedef struct {
 char empId[20];
 char name[50];
@@ -32,8 +47,8 @@ return i;
 return -1;
 }
 
-void genLogID (char logId){ // tu tao ma log moi cho bang cham cong 
-	sprintf("logId" , "HG%04d" , timeCount + 1);
+void genLogID (char logId[]){ // tu tao ma log moi cho bang cham cong 
+	sprintf(logId , "HG%04d" , timeCount + 1);
 }
 
 int checked (char empId[] , char date[]){ // kiem tra xem nhan vien da cham cong ngay do chua
@@ -287,6 +302,8 @@ employees[empCount++] = e1;
 employees[empCount++] = e2;
 employees[empCount++] = e3;
 }
+
+
 
 int main (){
 	int choice ;
