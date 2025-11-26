@@ -19,6 +19,32 @@ void viewTimesheet();     // F08
 // Ham ho tro
 void addSampleList();
 
+int main (){
+	int choice ;
+	addSampleList();
+	do {
+		choice = showMenu();
+		
+	    switch (choice) {
+	        case 1: addEmployee(); break;
+	        case 2: updateEmployee(); break;
+	        case 3: deleteEmployee(); break;
+	        case 4: printList(); break;
+			case 5: searchByName(); break;
+			case 6: sortByBasesalary(); break;
+			case 7: checkIn(); break;
+			//case 8: viewTimesheet(); break;
+			case 9: {
+				printf("Thoat chuong trinh !\n");
+				break;
+			}
+			default : printf("Lua chon khong hop le !\n"); 
+	    }
+	    //dung switch case de chay tuong ung voi lua chon nguoi dung nhap vao
+	}while (choice != 9);
+	return 0 ;
+}
+
 int showMenu() {
     int choice;
 
@@ -249,7 +275,7 @@ void printList() {
         return;
     }
 
-    int perPage = 2;
+    int perPage = 5 ;
     int totalPage = (empCount + perPage - 1) / perPage;
     int page = 1;  // bat dau xem tu trang 1
 
@@ -261,7 +287,7 @@ void printList() {
 
         // Nhap dung so trang hien tai
         while (1) {
-            printf("Nhap trang %d: ", page);
+            printf("Nhap trang : ");
 
             if (scanf("%d", &p) != 1) {
                 printf("Dinh dang khong hop le! Vui long nhap so.\n");
@@ -463,31 +489,5 @@ employees[empCount++] = e1;
 employees[empCount++] = e2;
 employees[empCount++] = e3;
 employees[empCount++] = e4;
-}
-
-int main (){
-	int choice ;
-	addSampleList();
-	do {
-		choice = showMenu();
-		
-	    switch (choice) {
-	        case 1: addEmployee(); break;
-	        case 2: updateEmployee(); break;
-	        case 3: deleteEmployee(); break;
-	        case 4: printList(); break;
-			case 5: searchByName(); break;
-			case 6: sortByBasesalary(); break;
-			case 7: checkIn(); break;
-			//case 8: viewTimesheet(); break;
-			case 9: {
-				printf("Thoat chuong trinh !\n");
-				break;
-			}
-			default : printf("Lua chon khong hop le !\n"); 
-	    }
-	    //dung switch case de chay tuong ung voi lua chon nguoi dung nhap vao
-	}while (choice != 9);
-	return 0 ;
 }
 
