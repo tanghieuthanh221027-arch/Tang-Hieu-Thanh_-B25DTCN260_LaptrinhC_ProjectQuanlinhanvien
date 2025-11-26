@@ -242,59 +242,67 @@ void deleteEmployee() {
 }
 
 
-//F04 - Hien thi danh sach nhan vien 
+// F04 - Hien thi danh sach nhan vien 
 void printList() {
     if (empCount == 0) {
         printf("Danh sach nhan vien hien dang trong!\n");
         return;
     }
 
-    int perPage = 2;  // moi trang 3 nhan vien
+    int perPage = 2;
     int totalPage = (empCount + perPage - 1) / perPage;
-    int page;
+    int page = 1;  // bat dau xem tu trang 1
 
     printf("Danh sach co %d trang.\n", totalPage);
+    printf("Ban se lan luot nhap cac trang tu 1 den %d.\n\n", totalPage);
 
-    while (1) {
-        printf("Nhap trang muon xem (1 - %d): ", totalPage);
-        if (scanf("%d", &page) != 1) {
-            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); //nhap khong phai so thi bao loi 
-            while (getchar() != '\n');
-            continue;
+    while (page <= totalPage) {
+        int p;
+
+        // Nhap dung so trang hien tai
+        while (1) {
+            printf("Nhap trang %d: ", page);
+
+            if (scanf("%d", &p) != 1) {
+                printf("Dinh dang khong hop le! Vui long nhap so.\n");
+                while (getchar() != '\n');
+                continue;
+            }
+            while (getchar() != '\n'); // clear buffer
+
+            if (p != page) {
+                printf("Ban phai nhap dung so trang: %d\n", page);
+                continue;
+            }
+
+            break;
         }
-        while (getchar() != '\n'); // clear buffer
 
-        if (page < 1 || page > totalPage) {
-            printf("So trang khong hop le! Vui long nhap lai.\n");
-            continue;
+        // Hien thi trang do
+        int start = (page - 1) * perPage;
+        int end = start + perPage;
+        if (end > empCount) end = empCount;
+
+        printf("\n=== TRANG %d / %d ===\n", page, totalPage);
+
+        printf("+----+------------+----------------------+---------------+------------+----------+\n");
+        printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
+        printf("+----+------------+----------------------+---------------+------------+----------+\n");
+
+        for (int i = start; i < end; i++) {
+            printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
+                   i + 1,
+                   employees[i].empId,
+                   employees[i].name,
+                   employees[i].position,
+                   employees[i].baseSalary,
+                   employees[i].workDay);
         }
-        break; 
+        printf("+----+------------+----------------------+---------------+------------+----------+\n\n");
+
+        page++; // chuyen sang trang tiep theo
     }
-
-    // Tinh vi tri bat dau – ket thúc
-    int start = (page - 1) * perPage;
-    int end = start + perPage;
-    if (end > empCount) end = empCount;
-
-    printf("\n=== TRANG %d / %d ===\n", page, totalPage);
-
-    printf("+----+------------+----------------------+---------------+------------+----------+\n");
-    printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
-    printf("+----+------------+----------------------+---------------+------------+----------+\n");
-
-    for (int i = start; i < end; i++) {
-        printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
-               i + 1,
-               employees[i].empId,
-               employees[i].name,
-               employees[i].position,
-               employees[i].baseSalary,
-               employees[i].workDay);
-    }
-
-    printf("+----+------------+----------------------+---------------+------------+----------+\n");
 }
-
 
 //F05 - Tim kiem nhan vien theo ten 
 void searchByName() {
@@ -482,3 +490,4 @@ int main (){
 	}while (choice != 9);
 	return 0 ;
 }
+
