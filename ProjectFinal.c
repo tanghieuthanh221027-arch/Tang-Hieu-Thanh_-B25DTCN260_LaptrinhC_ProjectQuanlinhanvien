@@ -244,24 +244,57 @@ void deleteEmployee() {
 
 //F04 - Hien thi danh sach nhan vien 
 void printList() {
-if (empCount == 0) {
-printf("Danh sach trong!\n"); 
-return;
-}
- 	printf("+----+------------+----------------------+---------------+------------+----------+\n");
+    if (empCount == 0) {
+        printf("Danh sach nhan vien hien dang trong!\n");
+        return;
+    }
+
+    int perPage = 2;  // moi trang 3 nhan vien
+    int totalPage = (empCount + perPage - 1) / perPage;
+    int page;
+
+    printf("Danh sach co %d trang.\n", totalPage);
+
+    while (1) {
+        printf("Nhap trang muon xem (1 - %d): ", totalPage);
+        if (scanf("%d", &page) != 1) {
+            printf("Dinh dang khong hop le. Vui long nhap 1 so nguyen.\n"); //nhap khong phai so thi bao loi 
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n'); // clear buffer
+
+        if (page < 1 || page > totalPage) {
+            printf("So trang khong hop le! Vui long nhap lai.\n");
+            continue;
+        }
+        break; 
+    }
+
+    // Tinh vi tri bat dau – ket thúc
+    int start = (page - 1) * perPage;
+    int end = start + perPage;
+    if (end > empCount) end = empCount;
+
+    printf("\n=== TRANG %d / %d ===\n", page, totalPage);
+
+    printf("+----+------------+----------------------+---------------+------------+----------+\n");
     printf("| STT| Ma NV      | Ten NV               | Chuc vu       | Luong      | Ngay cong|\n");
     printf("+----+------------+----------------------+---------------+------------+----------+\n");
-for (int i = 0; i < empCount; i++) {
-    printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
-        i + 1,
-        employees[i].empId,
-        employees[i].name,
-        employees[i].position,
-        employees[i].baseSalary,
-        employees[i].workDay);
-	}
-	printf("+----+------------+----------------------+---------------+------------+----------+\n");
+
+    for (int i = start; i < end; i++) {
+        printf("| %2d | %-10s | %-20s | %-10s    | %10.2lf | %8d |\n",
+               i + 1,
+               employees[i].empId,
+               employees[i].name,
+               employees[i].position,
+               employees[i].baseSalary,
+               employees[i].workDay);
+    }
+
+    printf("+----+------------+----------------------+---------------+------------+----------+\n");
 }
+
 
 //F05 - Tim kiem nhan vien theo ten 
 void searchByName() {
@@ -294,44 +327,45 @@ if (!found)
 }
 
 //F06 - Sap xep nhan vien theo luong co ban tang dan / giam dan
-void sortByBasesalary (){
-	if(empCount == 0){
-		printf("Danh sach nhan vien hien tai dang trong!\n");
-		return ; 
-	}
-	int option ;
-	while(getchar() != '\n');
-	
-	printf("1. Tang dan\n");
-	printf("2. Giam dan\n");
-	printf("Chon cach sap xep : "); // yeu cau nguoi dung chon 1 trong 2 option sap xep 
-	scanf("%d" , &option);
-	
-	if(option != 1 && option != 2){
-		printf("Lua chon sap xep khong hop le !\n"); // neu khac 2 option bao loi 
-		return ;
-	}
-	for (int i = 0 ; i < empCount - 1; i++){
-		for(int j = i + 1 ; j < empCount ; j++){
-			int swap = 0 ; // tao bien hoan doi
-			if(option == 1 && employees[i].baseSalary > employees[j].baseSalary){ // sap xep tang dan
-				swap = 1 ;
-			}
-			if(option == 2 && employees[i].baseSalary < employees[j].baseSalary){ // sap xep giam dan
-				swap = 1 ;
-			}
-			if(swap){
-				Employee temp = employees[i];
-				employees[i] = employees[j];
-				employees[j] = temp ; // thuc hien hoan doi vi tri khi swap = 1 (luon dung)
-			}
-		}
-	}
-	if(option == 1 ){
-		printf("Da sap xep danh sach nhan vien tang dan theo luong !\n");
-	}else {
-		printf("Da sap xep danh sach nhan vien giam dan theo luong !\n");
-	}
+void sortByBasesalary() {
+    if (empCount == 0) {
+        printf("Danh sach nhan vien hien tai dang trong!\n");
+        return;
+    }
+
+    int option;
+    while (1) {
+        printf("1. Tang dan\n");
+        printf("2. Giam dan\n");
+        printf("Chon cach sap xep: "); //yeu cau nguoi dung chon 1 trong 2 option sap xep
+        scanf("%d", &option);
+        while (getchar() != '\n');
+
+        if (option == 1 || option == 2) break;
+        printf("Lua chon khong hop le! Hay nhap lai.\n");
+    }
+    for (int i = 0; i < empCount - 1; i++) {
+        for (int j = i + 1; j < empCount; j++) {
+
+            int swap = 0;
+
+            if (option == 1 && employees[i].baseSalary > employees[j].baseSalary)
+                swap = 1;
+
+            if (option == 2 && employees[i].baseSalary < employees[j].baseSalary)
+                swap = 1;
+
+            if (swap) {
+                Employee temp = employees[i];
+                employees[i] = employees[j];
+                employees[j] = temp;
+            }
+        }
+    }
+    if (option == 1)
+        printf("Da sap xep tang dan theo luong thanh cong!\n");
+    else
+        printf("Da sap xep giam dan theo luong thanh cong!\n");
 }
 
 //F07 - Cham cong 
@@ -416,9 +450,11 @@ void addSampleList() {  // tao 1 danh sach nhan vien co san
 Employee e1 = {"HG001", "Tran Minh Duc", "Quan li", 2000, 5};
 Employee e2 = {"HG002", "Phung Duy Dat", "Nhan vien", 1000, 3};
 Employee e3 = {"HG003", "Nguyen Minh Hieu", "Giam doc", 5000, 8};
+Employee e4 = {"HG004", "Tang Hieu Thanh", "Chu tich", 10000 , 11};
 employees[empCount++] = e1;
 employees[empCount++] = e2;
 employees[empCount++] = e3;
+employees[empCount++] = e4;
 }
 
 int main (){
