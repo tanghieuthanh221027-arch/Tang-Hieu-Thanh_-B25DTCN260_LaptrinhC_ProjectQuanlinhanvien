@@ -330,7 +330,6 @@ void deleteEmployee() {
 	}
 }
 
-
 // F04 - Hien thi danh sach nhan vien co dieu huong
 void printList() {
     if (empCount == 0) {
@@ -345,7 +344,6 @@ void printList() {
     char choice[10];
 
     while (1) {
-        // Tính v? trí ph?n t?
         int start = (page - 1) * perPage;
         int end = start + perPage;
         if (end > empCount) end = empCount;
@@ -368,7 +366,6 @@ void printList() {
         }
         printf("+----+------------+----------------------+---------------+------------+----------+\n");
 
-        // MENU ÐI?U HÝ?NG
         printf("\nLua chon:\n");
         printf(" N - Trang tiep theo\n");
         printf(" P - Trang truoc\n");
@@ -379,7 +376,6 @@ void printList() {
         fgets(choice, sizeof(choice), stdin);
         choice[strcspn(choice, "\n")] = 0;
 
-        // X? l? l?a ch?n
         if (strcasecmp(choice, "N") == 0) {
             if (page < totalPage) page++;
             else printf("Ban dang o trang cuoi!\n");
@@ -432,7 +428,7 @@ void searchByName() {
 
     while (getchar() != '\n'); // clear buffer
 
-    // Nh?p tên c?n t?m
+    // Nhap ten can tim
     while (1) {
         printf("Nhap ten nhan vien can tim: ");
         fgets(name, sizeof(name), stdin);
@@ -563,127 +559,160 @@ void checkIn (){
 	printf("Da cham cong cho nhan vien co ma %s vao ngay %d/%d/%d thanh cong !\n" , inpId , d , m , y);
 }
 
+// F08 - Xem bang cham cong
 void viewTimesheet() {
     char inpId[20];
     char buffer[50];
-    int y, m;
+    int sDay, sMonth, sYear; // Ngay bat dau
+    int day, month, year;
+    int idx;
 
-    // ngay hien tai
+    // Lay ngay hien tai
     time_t t = time(NULL);
     struct tm today = *localtime(&t);
+    int cDay = today.tm_mday;
+    int cMonth = today.tm_mon + 1;
+    int cYear = today.tm_year + 1900;
 
-    // nhap id nhan vien
-    while (1) {
+    // Nhap ID nhan vien
+    do {
         printf("Nhap ID nhan vien muon xem cham cong: ");
         fgets(inpId, sizeof(inpId), stdin);
         inpId[strcspn(inpId, "\n")] = 0;
-
         if (strlen(inpId) == 0) {
-            printf("ID khong duoc bo trong! Nhap lai!\n");
-            continue;
+            printf("ID khong duoc bo trong! Vui long nhap lai.\n");
         }
+    } while (strlen(inpId) == 0);
 
-        if (findEmpByID(inpId) == -1) {
-            printf("Khong tim thay nhan vien co ID %s!\n", inpId);
-            continue;
-        }
-
-        break;
-    }
-
-    // nhap nam
-    while (1) {
-        printf("Nhap nam (>= 2000): ");
-        fgets(buffer, sizeof(buffer), stdin);
-        buffer[strcspn(buffer, "\n")] = 0;
-
-        if (sscanf(buffer, "%d", &y) != 1) {
-            printf("Khong duoc nhap chu! Nhap lai!\n");
-            continue;
-        }
-
-        if (y < 2000) {
-            printf("Nam phai >= 2000!\n");
-            continue;
-        }
-
-        break;
-    }
-
-    // nhap thang
-    while (1) {
-        printf("Nhap thang (1-12): ");
-        fgets(buffer, sizeof(buffer), stdin);
-        buffer[strcspn(buffer, "\n")] = 0;
-
-        if (sscanf(buffer, "%d", &m) != 1) {
-            printf("Khong duoc nhap chu! Nhap lai!\n");
-            continue;
-        }
-
-        if (m < 1 || m > 12) {
-            printf("Thang phai tu 1..12!\n");
-            continue;
-        }
-
-        break;
-    }
-
-    // khong cham cong trong tuong lai
-    if (y > today.tm_year + 1900 ||
-       (y == today.tm_year + 1900 && m > today.tm_mon + 1)) {
-        printf("Khong the xem cham cong trong tuong lai!\n");
+    int empIndex = findEmpByID(inpId);
+    if (empIndex == -1) {
+        printf("Khong tim thay nhan vien co ID %s!\n", inpId);
         return;
     }
 
-    // so ngay trong thang
-    int totalDays;
-    if (m == 2)
-        totalDays = ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) ? 29 : 28;
-    else if (m == 4 || m == 6 || m == 9 || m == 11)
-        totalDays = 30;
-    else
-        totalDays = 31;
+    // Nhap ngay bat dau
+    while (1) {
+        printf("Nhap ngay bat dau (dd/mm/yyyy): ");
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
 
-    // in den ngay nguoi dung nhap vao 
-    int displayDays = totalDays;
-    if (y == today.tm_year + 1900 && m == today.tm_mon + 1) {
-        displayDays = today.tm_mday;
+        if (sscanf(buffer, "%d/%d/%d", &sDay, &sMonth, &sYear) != 3) {
+            printf("Dinh dang phai dd/mm/yyyy!\n");
+            continue;
+        }
+        if (sYear < 2000) {
+            printf("Nam phai >= 2000!\n");
+            continue;
+        }
+        if (sMonth < 1 || sMonth > 12) {
+            printf("Thang khong hop le!\n");
+            continue;
+        }
+        if (sDay < 1 || sDay > 31) {
+            printf("Ngay khong hop le!\n");
+            continue;
+        }
+        break;
     }
 
-    printf("\n===== Bang cham cong cua %s - %02d/%04d =====\n",
-           inpId, m, y);
-    printf("ID Log     | Ngay        | Trang thai\n");
-    printf("----------------------------------------\n");
+    // Khong cham cong trong tuong lai  
+    if (futureDate(sDay, sMonth, sYear)) {
+        printf("Ngay bat dau khong duoc vuot qua hien tai!\n");
+        return;
+    }
 
-    char dateCheck[20];
-    int found;
+    // Tao danh sach tat ca ngay tu start -> hien tai
+    struct DateList {
+        char dateStr[20];
+    } list[2000];
 
-    for (int d = 1; d <= displayDays; d++) {
-        sprintf(dateCheck, "%02d/%02d/%04d", d, m, y);
-        found = 0;
+    int listCount = 0;
+    day = sDay;
+    month = sMonth;
+    year = sYear;
 
-        for (int i = 0; i < timeCount; i++) {
-            if (strcmp(timeSheet[i].empId, inpId) == 0 &&
-                strcmp(timeSheet[i].date, dateCheck) == 0) {
+    while (1) {
+        sprintf(list[listCount].dateStr, "%02d/%02d/%04d", day, month, year);
+        listCount++;
 
-                printf("%-10s | %-10s | %s\n",
-                       timeSheet[i].logId,
-                       timeSheet[i].date,
-                       timeSheet[i].status);
+        // Neu da den hien tai thi dung
+        if (day == cDay && month == cMonth && year == cYear) break;
 
-                found = 1;
-                break;
+        // Tang ngay
+        int maxDay;
+        if (month == 2) {
+            maxDay = ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
+        } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+            maxDay = 30;
+        } else {
+            maxDay = 31;
+        }
+
+        day++;
+        if (day > maxDay) {
+            day = 1;
+            month++;
+            if (month > 12) {
+                month = 1;
+                year++;
+            }
+        }
+    }
+
+    // Phan trang
+    int perPage = 7;
+    int totalPage = (listCount + perPage - 1) / perPage;
+    int page = 1;
+    char cmd[10];
+
+    while (1) {
+        system("cls");
+        printf("\n======= Bang cham cong %s (Trang %d/%d) =======\n", inpId, page, totalPage);
+        printf("ID Log     | Ngay        | Trang thai\n");
+        printf("----------------------------------------\n");
+
+        int start = (page - 1) * perPage;
+        int end = start + perPage;
+        if (end > listCount) end = listCount;
+
+        for (idx = start; idx < end; idx++) {
+            int found = 0;
+            for (int i = 0; i < timeCount; i++) {
+                if (strcmp(timeSheet[i].empId, inpId) == 0 &&
+                    strcmp(timeSheet[i].date, list[idx].dateStr) == 0) {
+                    printf("%-10s | %-10s | %s\n",
+                           timeSheet[i].logId,
+                           timeSheet[i].date,
+                           timeSheet[i].status);
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                printf("---------- | %-10s | Nghi lam\n", list[idx].dateStr);
             }
         }
 
-        if (!found) {
-            printf("---------- | %-10s | Nghi lam\n", dateCheck);
+        printf("----------------------------------------\n");
+        printf("[N]ext [P]revious [G]o to page [Q]uit\n");
+        printf("Chon: ");
+        fgets(cmd, sizeof(cmd), stdin);
+        cmd[strcspn(cmd, "\n")] = 0;
+
+        if (strcasecmp(cmd, "N") == 0) {
+            if (page < totalPage) page++;
+        } else if (strcasecmp(cmd, "P") == 0) {
+            if (page > 1) page--;
+        } else if (strcasecmp(cmd, "G") == 0) {
+            printf("Nhap trang muon den (1 - %d): ", totalPage);
+            fgets(cmd, sizeof(cmd), stdin);
+            int newPage = atoi(cmd);
+            if (newPage >= 1 && newPage <= totalPage) page = newPage;
+        } else if (strcasecmp(cmd, "Q") == 0) {
+            return;
         }
     }
-    printf("----------------------------------------\n");
 }
-
 
 void addSampleList() {  // tao 1 danh sach nhan vien co san 
 Employee e1 = {"HG001", "Tran Minh Duc", "Quan li", 2000, 5};
